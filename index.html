@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>书签管理 · Bookmark Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="container">
+      <h1 class="logo">
+        <svg class="icon logo-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v16.3a.7.7 0 0 1-1.1.57L12 16.9l-5.9 3.97A.7.7 0 0 1 5 20.3V4a1 1 0 0 1 1-1z"/></svg>
+        书签管理
+      </h1>
+      <p class="header-sub" id="headerStats"></p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <div class="search-box">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 1 1 0 15c-1.8 0-3.46-.63-4.76-1.69L3.3 18.76a1 1 0 0 1-1.42-1.42l2.45-2.44A7.5 7.5 0 0 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></svg>
+        <label class="visually-hidden" for="searchInput">搜索书签</label>
+        <input type="search" id="searchInput" placeholder="搜索标题、网址、分类或备注…" autocomplete="off">
+      </div>
+      <label class="visually-hidden" for="categoryFilter">按分类筛选</label>
+      <select id="categoryFilter"></select>
+      <div class="toolbar-actions">
+        <button type="button" id="addBtn" class="btn btn-primary">＋ 添加书签</button>
+        <button type="button" id="exportBtn" class="btn" title="将全部书签导出为 JSON 文件">导出</button>
+        <button type="button" id="importBtn" class="btn" title="从 JSON 文件导入书签">导入</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+    </section>
+
+    <section id="bookmarkGrid" class="bookmark-grid"></section>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <svg class="icon empty-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h5.6a2 2 0 0 1 1.4.6L12.4 6H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 5v9h16v-9H4z"/></svg>
+      <p id="emptyText">还没有任何书签</p>
+      <button type="button" id="emptyAddBtn" class="btn btn-primary" hidden>添加第一个书签</button>
+    </div>
+  </main>
+
+  <!-- 添加 / 编辑弹窗 -->
+  <div class="overlay" id="formOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+      <div class="modal-head">
+        <h2 id="formModalTitle">添加书签</h2>
+        <button type="button" class="icon-btn" id="formCloseBtn" aria-label="关闭">✕</button>
+      </div>
+      <form id="bookmarkForm" novalidate>
+        <input type="hidden" id="fieldId">
+        <div class="form-row">
+          <label for="fieldTitle">标题 <em>*</em></label>
+          <input type="text" id="fieldTitle" maxlength="100" placeholder="例如：GitHub" required>
+        </div>
+        <div class="form-row">
+          <label for="fieldUrl">网址 <em>*</em></label>
+          <input type="text" id="fieldUrl" inputmode="url" placeholder="例如：https://github.com" required>
+        </div>
+        <div class="form-row">
+          <label for="fieldCategory">分类</label>
+          <input type="text" id="fieldCategory" list="categoryOptions" maxlength="30" placeholder="例如：开发工具（可输入新分类）">
+          <datalist id="categoryOptions"></datalist>
+        </div>
+        <div class="form-row">
+          <label for="fieldNotes">备注</label>
+          <textarea id="fieldNotes" rows="3" maxlength="300" placeholder="可选，记录这个网址的用途"></textarea>
+        </div>
+        <p class="form-error" id="formError" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="formCancelBtn">取消</button>
+          <button type="submit" class="btn btn-primary" id="formSubmitBtn">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div class="overlay" id="confirmOverlay" hidden>
+    <div class="modal modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="confirmMessage">
+      <h2>删除书签</h2>
+      <p class="confirm-text" id="confirmMessage"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="confirmCancelBtn">取消</button>
+        <button type="button" class="btn btn-danger" id="confirmOkBtn">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
